@@ -17,8 +17,8 @@ class GradesController < ApplicationController
         self_review_finished?
     when 'view_team'
       if current_user_is_a? 'Student' # students can only see the heat map for their own team
-        participant = AssignmentParticipant.find(params[:id])
-        current_user_is_assignment_participant?(participant.assignment.id)
+        team = AssignmentTeam.find(params[:id])
+        current_user_is_assignment_participant?(team.assignment.id)
       else
         true
       end
@@ -55,11 +55,14 @@ class GradesController < ApplicationController
   end
 
   def view_my_scores
-    @participant = AssignmentParticipant.find(params[:id])
-    @team_id = TeamsUser.team_id(@participant.parent_id, @participant.user_id)
+
+    @team_id = params[:id]
+    @team = AssignmentTeam.find(@team_id)
+    @assignment = @team.assignment
+    @participant = @assignment.participants.first
     return if redirect_when_disallowed
 
-    @assignment = @participant.assignment
+
     questionnaires = @assignment.questionnaires
     @questions = retrieve_questions questionnaires, @assignment.id
     # @pscore has the newest versions of response for each response map, and only one for each response map (unless it is vary rubric by round)
@@ -78,31 +81,58 @@ class GradesController < ApplicationController
 
   # method for alternative view
   def view_team
-    @participant = AssignmentParticipant.find(params[:id])
-    @assignment = @participant.assignment
-    @team = @participant.team
-    @team_id = @team.id
+    #find participant only when i need it
+    @team_id = params[:id]
+    @team = AssignmentTeam.find(@team_id)
+    @assignment = @team.assignment
+    @participant = @assignment.participants.first
+
     questionnaires = @assignment.questionnaires
     @questions = retrieve_questions(questionnaires, @assignment.id)
     @pscore = participant_scores(@participant, @questions)
 
     @vmlist = []
 
-    counter_for_same_rubric = 0
-    questionnaires.each do |questionnaire|
-      @round = nil
-      if @assignment.vary_by_round && questionnaire.type == 'ReviewQuestionnaire'
-        questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id)
-        if questionnaires.count > 1
-          @round = questionnaires[counter_for_same_rubric].used_in_round
-          counter_for_same_rubric += 1
-        else
-          @round = questionnaires[0].used_in_round
-          counter_for_same_rubric = 0
+    temp_questionnaire_list =[]
+
+    rounds_of_reviews = @assignment.rounds_of_reviews
+
+    1.upto(rounds_of_reviews) do |round|
+      questionnaires.each do |questionnaire|
+        #Put the review questionnaires used in certain round directly to vm_list so that can be displayed first
+        @round = round #set the round number
+        if  questionnaire.type == 'ReviewQuestionnaire' &&
+          AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id, used_in_round: round).length != 0 #to determine if the questionnaire is used in that round.
+          @vmlist << populate_view_model(questionnaire)
+        end
+        #Store the none-review questionnaires first and add them to the vm_list later so that they won't mess up the order
+        if questionnaire.type != 'ReviewQuestionnaire'
+          temp_questionnaire_list << questionnaire unless temp_questionnaire_list.include?(questionnaire)
         end
       end
-      @vmlist << populate_view_model(questionnaire)
     end
+
+    temp_questionnaire_list.each do |temp_questionnaire|
+      @round = nil
+      @vmlist << populate_view_model(temp_questionnaire)
+    end
+
+    # counter_for_same_rubric = 0
+    # questionnaires.each do |questionnaire|
+    #   @round = nil
+    #   if @assignment.vary_by_round && questionnaire.type == 'ReviewQuestionnaire'
+    #     questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id)
+    #     if questionnaires.count > 1
+    #       @round = questionnaires[counter_for_same_rubric].used_in_round
+    #       counter_for_same_rubric += 1
+    #     else
+    #       @round = questionnaires[0].used_in_round
+    #       counter_for_same_rubric = 0
+    #     end
+    #   end
+    #   @vmlist << populate_view_model(questionnaire)
+    # end
+
     @current_role_name = current_role_name
   end
 
@@ -188,12 +218,13 @@ class GradesController < ApplicationController
 
   private
 
+  #need comments
   def populate_view_model(questionnaire)
     vm = VmQuestionResponse.new(questionnaire, @assignment, @round)
     vmquestions = questionnaire.questions
     vm.add_questions(vmquestions)
     vm.add_team_members(@team)
-    vm.add_reviews(@participant, @team, @assignment.vary_by_round)
+    vm.get_review_responses(@participant, @team)
     vm.number_of_comments_greater_than_10_words
     vm
   end
@@ -204,16 +235,14 @@ class GradesController < ApplicationController
     ## This following code was cloned from response_controller.
 
     # ACS Check if team count is more than 1 instead of checking if it is a team assignment
-    if @participant.assignment.max_team_size > 1
-      team = @participant.team
-      unless team.nil? || (team.user? session[:user])
+    if @assignment.max_team_size > 1
+      unless @team.nil? || (@team.user? session[:user])
         flash[:error] = 'You are not on the team that wrote this feedback'
         redirect_to '/'
         return true
       end
     else
-      reviewer = AssignmentParticipant.where(user_id: session[:user].id, parent_id: @participant.assignment.id).first
-      return true unless current_user_id?(reviewer.try(:user_id))
+      return true unless current_user_id?(@participant.try(:user_id))
     end
     false
   end

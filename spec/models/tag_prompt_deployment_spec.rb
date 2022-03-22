@@ -95,7 +95,7 @@ describe TagPromptDeployment do
 
       user_answer_tagging = tag_dep.assignment_tagging_progress
 
-      expect(ReviewResponseMap).not_to receive(:get_responses_for_team_round)
+      expect(ReviewResponseMap).not_to receive(:get_responses_for_round)
       expect(ResponseMap).not_to receive(:assessments_for)
       expect(Answer).not_to receive(:where)
       expect(AnswerTag).not_to receive(:where)
@@ -108,7 +108,7 @@ describe TagPromptDeployment do
 
       user_answer_tagging = tag_dep.assignment_tagging_progress
 
-      expect(ReviewResponseMap).not_to receive(:get_responses_for_team_round)
+      expect(ReviewResponseMap).not_to receive(:get_responses_for_round)
       expect(ResponseMap).not_to receive(:assessments_for)
       expect(Answer).not_to receive(:where)
       expect(AnswerTag).not_to receive(:where)
@@ -129,7 +129,7 @@ describe TagPromptDeployment do
 
       user_answer_tagging = tag_dep.assignment_tagging_progress
 
-      expect(ReviewResponseMap).not_to receive(:get_responses_for_team_round)
+      expect(ReviewResponseMap).not_to receive(:get_responses_for_round)
       expect(user_answer_tagging).not_to be_empty
       expect(user_answer_tagging.length).to eq(2)
 
@@ -148,7 +148,7 @@ describe TagPromptDeployment do
       allow(Team).to receive(:where).with(parent_id: assignment.id).and_return([team])
       allow(Question).to receive(:where).with(questionnaire_id: question.questionnaire.id, type: tag_dep.question_type).and_return([question])
       allow(assignment).to receive(:vary_by_round).and_return(true)
-      allow(ReviewResponseMap).to receive(:get_responses_for_team_round).and_return([response])
+      allow(ReviewResponseMap).to receive(:get_responses_for_round).and_return([response])
       allow(Answer).to receive(:where).and_return(answersObjectArray)
       allow(TeamsUser).to receive(:where).with(team_id: team.id).and_return([team_user1, team_user2])
       allow(User).to receive(:find).with(user1.id).and_return(user1)
@@ -177,7 +177,7 @@ describe TagPromptDeployment do
       allow(Team).to receive(:where).with(parent_id: assignment.id).and_return([team])
       allow(Question).to receive(:where).with(questionnaire_id: question.questionnaire.id, type: tag_dep.question_type).and_return([question])
       allow(assignment).to receive(:vary_by_round).and_return(true)
-      allow(ReviewResponseMap).to receive(:get_responses_for_team_round).and_return([response])
+      allow(ReviewResponseMap).to receive(:get_responses_for_round).and_return([response])
       allow(Answer).to receive(:where).and_return(answersObjectArray)
       allow(TeamsUser).to receive(:where).with(team_id: team.id).and_return([team_user1, team_user2])
       allow(User).to receive(:find).with(user1.id).and_return(user1)

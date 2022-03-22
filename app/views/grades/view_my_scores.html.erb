@@ -18,7 +18,7 @@
 <H1><%=t ".score_for"%> <%= @assignment.name %></H1>
 <div id="view_link">
   <div id="tag_stats"></div>
-  <%= link_to t(".main_view"), controller: 'grades', action: 'view_team', id: params[:id] %>
+  <%= link_to t(".main_view"), controller: 'grades', action: 'view_team', id: @team.id %>
   <BR/>
 </div>
 

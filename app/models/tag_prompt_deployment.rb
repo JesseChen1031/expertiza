@@ -37,7 +37,7 @@ class TagPromptDeployment < ActiveRecord::Base
         if assignment.vary_by_round
           responses = []
           1.upto(assignment.rounds_of_reviews).each do |round|
-            responses += ReviewResponseMap.get_responses_for_team_round(team, round)
+            responses += ReviewResponseMap.get_responses_for_round(team, round)
           end
         else
           responses = ResponseMap.assessments_for(team)

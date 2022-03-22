@@ -93,7 +93,7 @@ class ReviewResponseMap < ResponseMap
   end
 
   # return the responses for specified round, for varying rubric feature -Yang
-  def self.get_responses_for_team_round(team, round)
+  def self.get_responses_for_round(team, round)
     responses = []
     if team.id
       maps = ResponseMap.where(reviewee_id: team.id, type: 'ReviewResponseMap')

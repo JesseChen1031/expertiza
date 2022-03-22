@@ -21,7 +21,7 @@ class ReportsController < ApplicationController
   end
 
   # function to export specific headers to the csv
-  def self.export_details_fields(detail_options)
+  def export_details_fields(detail_options)
     fields = []
     fields << 'Name' if detail_options['name'] == 'true'
     fields << 'UnityID' if detail_options['unity_id'] == 'true'
@@ -32,7 +32,7 @@ class ReportsController < ApplicationController
   end
 
   # function to check for detail_options and return the correct csv
-  def self.export_details(csv, _parent_id, detail_options)
+  def export_details(csv, _parent_id, detail_options)
     return csv unless detail_options
   end
 end

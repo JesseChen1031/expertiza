@@ -68,7 +68,7 @@ describe VmQuestionResponse  do
       it 'adds reviews' do
         allow(ReviewResponseMap).to receive(:assessments_for).with(team).and_return(reviews)
         allow(ReviewResponseMap).to receive(:find).with(1).and_return(double('ReviewResponseMap', reviewer_id: 1))
-        response.add_reviews(participant, team, false)
+        response.get_review_responses(participant, team, false)
         expect(response.list_of_reviews.size).to eq(1)
         expect(response.list_of_reviewers.size).to eq(1)
         expect(response.list_of_reviews.first.map_id).to eq(1)
@@ -80,7 +80,7 @@ describe VmQuestionResponse  do
       it 'adds reviews' do
         response = VmQuestionResponse.new(author_feedback_questionnaire, assignment, 1)
         allow(FeedbackResponseMap).to receive(:where).with(reviewer_id: 3).and_return([double(id: 1, reviewer_id: 3, reviewee_id: 4, response_id: 1)])
-        response.add_reviews(participant, team, false)
+        response.get_review_responses(participant, team, false)
         expect(response.list_of_reviews.size).to eq(1)
         expect(response.list_of_reviewers.size).to eq(1)
       end
@@ -91,7 +91,7 @@ describe VmQuestionResponse  do
         response = VmQuestionResponse.new(teammate_review_questionnaire, assignment, 1)
         allow(participant).to receive(:teammate_reviews).and_return(reviews)
         allow(TeammateReviewResponseMap).to receive(:find_by).with(id: 1).and_return(double('TeammateReviewResponseMap', reviewer_id: 1))
-        response.add_reviews(participant, team, false)
+        response.get_review_responses(participant, team, false)
         expect(response.list_of_reviews.size).to eq(1)
         expect(response.list_of_reviewers.size).to eq(1)
         expect(response.list_of_reviews.first.map_id).to eq(1)
@@ -104,7 +104,7 @@ describe VmQuestionResponse  do
         response = VmQuestionResponse.new(metareview_questionnaire, assignment, 1)
         allow(participant).to receive(:metareviews).and_return(reviews)
         allow(MetareviewResponseMap).to receive(:find_by).with(id: 1).and_return(double('MetareviewResponseMap', reviewer_id: 1))
-        response.add_reviews(participant, team, false)
+        response.get_review_responses(participant, team, false)
         expect(response.list_of_reviews.size).to eq(1)
         expect(response.list_of_reviewers.size).to eq(1)
         expect(response.list_of_reviews.first.map_id).to eq(1)

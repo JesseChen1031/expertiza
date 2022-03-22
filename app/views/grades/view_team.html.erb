@@ -70,10 +70,11 @@
               <th>#</th>
               <th><%=t ".question"%></th>
               </thead>
-              <% vm.list_of_rows.each_with_index do |row, count| %>
+              <% count = 0 %>
+              <% vm.list_of_rows.each_with_index do |row| %>
                   <% if row.score_row.count > 0  %>
                       <tr style="background-color: #ffffff;">
-                        <td><%= count %></td>
+                        <td><%= count += 1 %></td>
                         <td><%= row.question_text %></td>
                       </tr>
                   <% end %>
@@ -111,17 +112,17 @@
             <!-- display the header row of the heatgrid table. this involves iterating through reviewers.-->
             <thead>
             <tr class="hide-scrollbar">
-              <th class="sorter-true">Question<span></span></th>
+              <th class="sorter-true">Criterion<span></span></th>
               <% i_final = 0 %>
               <% vm.list_of_reviews.each_with_index do |review, i| %>
                   <!-- instructors (or higher level users) see reviewer name, students see anonymized string -->
                   <% if (['Student'].include? @current_role_name) && @assignment.is_anonymous%>
-                    <%= render :partial => 'add_icon_to_name', :locals => {review: review, i: i} %>
+                      <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= "Review " + (i+1).to_s %></a>  </th>
                   <% else %>
                       <% user_name = User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).fullname(session[:ip]).to_s %>
-                    <%= render :partial => 'add_icon_to_name', :locals => {review: review, i: i} %>
+                      <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= user_name.to_s %></a>  </th>
                   <% end %>
-                  <% i_final = 0%>
+                  <% i_final += 1%>
               <% end %>
 
               <th class="sorter-true" align="right" >
@@ -143,7 +144,7 @@
 
                   <!-- actual cells with scores and colored background. -->
                   <% row.score_row.each do |score| %>
-                      <% score_comment = score.comment.nil? ? '' : score.comment %> 
+                      <% score_comment = score.comment.nil? ? '' : score.comment %>
                       <td class="<%= score.color_code %>" align="center" data-toggle="tooltip" title="<%= strip_tags(score.comment).html_safe%>">
                         <span class="<%=  underlined?(score) %>"><%= score.score_value.to_s %></span>
                       </td>

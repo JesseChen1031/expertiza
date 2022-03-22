@@ -140,7 +140,7 @@ module GradesHelper
       questions = questionnaire.questions
       vm.add_questions(questions)
       vm.add_team_members(@team)
-      vm.add_reviews(@participant, @team, @assignment.vary_by_round)
+      vm.get_review_responses(@participant, @team, @assignment.vary_by_round)
       vm.number_of_comments_greater_than_10_words
       @vmlist << vm
     end

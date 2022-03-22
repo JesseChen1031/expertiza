@@ -111,8 +111,8 @@ to display the label "Your team" in the student assignment tasks-->
       <% if @assignment.is_selfreview_enabled and unsubmitted_self_review?(@participant.id) %>
         <font color="gray"><%=t ".your_scores" %></font> <%=t ".self_review" %>
       <% else %>
-        <%= link_to t(".your_scores"), controller: 'grades', action: 'view_team', id: @participant.id %>
-        <%=t ".view_feedback" %>  &nbsp;  <%= link_to t(".alternate_view"),  controller: 'grades', action: 'view_my_scores', id: @participant.id %>
+        <%= link_to t(".your_scores"), controller: 'grades', action: 'view_team', id: @team.id %>
+        <%=t ".view_feedback" %>  &nbsp;  <%= link_to t(".alternate_view"),  controller: 'grades', action: 'view_my_scores', id: @team.id %>
       <% end %>
     </li>
   <% end %>

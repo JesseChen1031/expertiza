@@ -347,7 +347,7 @@ def compute_grades_by_rounds(assignment, questions, team)
   total_score = 0
   total_num_of_assessments = 0 # calculate grades for each rounds
   (1..assignment.num_review_rounds).each do |i|
-    assessments = ReviewResponseMap.get_responses_for_team_round(team, i)
+    assessments = ReviewResponseMap.get_responses_for_round(team, i)
     round_sym = ('review' + i.to_s).to_sym
     grades_by_rounds[round_sym] = aggregate_assessment_scores(assessments, questions[round_sym])
     total_num_of_assessments += assessments.size

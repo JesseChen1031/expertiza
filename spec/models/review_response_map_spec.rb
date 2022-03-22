@@ -190,7 +190,7 @@ describe ReviewResponseMap do
     allow(Team).to receive(:find).and_return(team)
     round = 1
     allow(ResponseMap).to receive(:where).with(reviewee_id: team.id, type: 'ReviewResponseMap').and_return([review_response_map1])
-    expect(ReviewResponseMap.get_responses_for_team_round(team, 1)).to eq([response])
+    expect(ReviewResponseMap.get_responses_for_round(team, 1)).to eq([response])
   end
 
   it '#final_versions_from_reviewer' do

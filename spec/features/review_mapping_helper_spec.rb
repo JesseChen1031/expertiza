@@ -150,8 +150,9 @@ describe 'review report html test cases' do
   def generated_csv(t_assignment, t_options)
     delimiter = ','
     CSV.generate(col_sep: delimiter) do |csv|
-      csv << ReportsController.export_details_fields(t_options)
-      ReportsController.export_details(csv, t_assignment, false)
+
+      csv << ReportsController.new.export_details_fields(t_options)
+      ReportsController.new.export_details(csv, t_assignment, false)
     end
   end
 end
