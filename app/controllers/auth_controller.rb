@@ -6,6 +6,10 @@ class AuthController < ApplicationController
   verify method: :post, only: %i[login logout],
          redirect_to: { action: :list }
 
+  before_filter :create_session_processor
+
+
+
   def action_allowed?
     case params[:action]
     when 'login', 'logout', 'login_failed'
@@ -17,7 +21,7 @@ class AuthController < ApplicationController
 
   def login
     if request.get?
-      AuthController.clear_session(session)
+      @session_processor.clear_session(session)
     else
       user = User.find_by_login(params[:login][:name])
       if user && user.valid_password?(params[:login][:password])
@@ -35,7 +39,7 @@ class AuthController < ApplicationController
     session[:user] = user
     session[:impersonate] = false
     ExpertizaLogger.info LoggerMessage.new('', user.name, 'Login successful')
-    AuthController.set_current_role(user.role_id, session)
+    @session_processor.set_current_role(user.role_id, session) # should be an instance of session.rb
     redirect_to controller: AuthHelper.get_home_controller(session[:user]),
                 action: AuthHelper.get_home_action(session[:user])
   end
@@ -47,15 +51,15 @@ class AuthController < ApplicationController
 
   def logout
     ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'Logging out!', request)
-    AuthController.logout(session)
+    @session_processor.clear_session(session)
     redirect_to '/'
   end
 
-  protected
-
-  def self.logout(session)
-    clear_session(session)
+  def create_session_processor
+    @session_processor = Session.new
   end
+
+  protected
 
   def self.set_current_role(role_id, session)
     if role_id

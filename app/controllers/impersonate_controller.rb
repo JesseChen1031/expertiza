@@ -29,7 +29,7 @@ class ImpersonateController < ApplicationController
       # E1991 : check whether instructor is currently in anonymized view
       user = User.anonymized_view?(session[:ip]) ? User.real_user_from_anonymized_name(params[:user][:name]) : User.find_by(name: params[:user][:name])
       session[:super_user] = session[:user] if session[:super_user].nil?
-      AuthController.clear_user_info(session, nil)
+      Session.newclear_user_info(session, nil)
       session[:original_user] = @original_user
       session[:impersonate] = true
       session[:user] = user
@@ -38,13 +38,13 @@ class ImpersonateController < ApplicationController
       if !params[:impersonate][:name].empty?
         # E1991 : check whether instructor is currently in anonymized view
         user = User.anonymized_view?(session[:ip]) ? User.real_user_from_anonymized_name(params[:impersonate][:name]) : User.find_by(name: params[:impersonate][:name])
-        AuthController.clear_user_info(session, nil)
+        Session.new.clear_user_info(session, nil)
         session[:user] = user
         session[:impersonate] = true
         session[:original_user] = @original_user
       else
         # E1991 : check whether instructor is currently in anonymized view
-        AuthController.clear_user_info(session, nil)
+        Session.new.clear_user_info(session, nil)
         session[:user] = session[:super_user]
         session[:super_user] = nil
       end
@@ -76,7 +76,7 @@ class ImpersonateController < ApplicationController
       if !@original_user.can_impersonate? user
         @message = "You cannot impersonate '#{params[:user][:name]}'."
         temp
-        AuthController.clear_user_info(session, nil)
+        Session.new.clear_user_info(session, nil)
       else
         overwrite_session
       end
@@ -144,7 +144,7 @@ class ImpersonateController < ApplicationController
           # Revert to original account when currently in the impersonated session
         else
           if !session[:super_user].nil?
-            AuthController.clear_user_info(session, nil)
+            Session.new.clear_user_info(session, nil)
             session[:user] = session[:super_user]
             user = session[:user]
             session[:super_user] = nil
@@ -154,7 +154,7 @@ class ImpersonateController < ApplicationController
         end
       end
       # Navigate to user's home location as the default landing page after impersonating or reverting
-      AuthController.set_current_role(user.role_id, session)
+      Session.new.set_current_role(user.role_id, session)
       redirect_to action: AuthHelper.get_home_action(session[:user]),
                   controller: AuthHelper.get_home_controller(session[:user])
     rescue Exception

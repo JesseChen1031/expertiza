@@ -59,7 +59,7 @@ describe AuthController do
   describe '#after_login' do
   	it 'calls set current role and redirects to home controller' do
   		allow(controller).to receive(:redirect_to)
-  		expect(AuthController).to receive(:set_current_role)
+  		expect(Session).to receive(:set_current_role)
   		controller.after_login(instructor)
   	end
   end
@@ -81,14 +81,14 @@ describe AuthController do
   		it 'sets the session for the role' do
   			allow(Role).to receive(:find).and_return(instructor_role)
   			expect(ExpertizaLogger).to receive(:info)
-  			AuthController.set_current_role(2, {})
+				@session_processor.set_current_role(2, {})
   		end
   	end
   	context 'when the role is not found' do
   		it 'throws an error' do
   			allow(Role).to receive(:find).and_return(nil)
   			expect(ExpertizaLogger).to receive(:error)
-  			AuthController.set_current_role(2, {})
+				@session_processor.set_current_role(2, {})
   		end
   	end
   end
@@ -103,7 +103,7 @@ describe AuthController do
   	it 'returns nil and clears session hash' do
   		session = {user: instructor}		
   		allow(Role).to receive(:student).and_return(instructor_role)
-  		expect(AuthController.clear_user_info(session, 1)).to be_nil
+  		expect(@session_processor.clear_user_info(session, 1)).to be_nil
   		expect(session[:clear]).to be_truthy
   	end
   end
