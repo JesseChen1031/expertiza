@@ -58,5 +58,5 @@ class AuthController < ApplicationController
   def create_session_processor
     @session_processor = Session.new
   end
-  
+
 end

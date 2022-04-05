@@ -89,9 +89,10 @@ class Ta < User
     new_assign.course_id = TaMapping.get_course_id(id)
   end
 
-  def assign_courses_to_assignment
-    @courses = TaMapping.get_courses(id)
-  end
+  #This method is not invoked at all, should be deleted
+  # def assign_courses_to_assignment
+  #   @courses = TaMapping.get_courses(id)
+  # end
 
   def teaching_assistant?
     true

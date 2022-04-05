@@ -180,7 +180,8 @@ class AssignmentsController < ApplicationController
   # place an assignment in a course
   def place_assignment_in_course
     @assignment = Assignment.find(params[:id])
-    @courses = Assignment.assign_courses_to_assignment(current_user)
+    # @courses = Assignment.assign_courses_to_assignment(current_user)
+    @courses = Course.where(instructor_id: current_user.id).order(:name)
   end
 
   # list team assignment submissions

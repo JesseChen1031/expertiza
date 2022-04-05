@@ -41,9 +41,13 @@ class ExportFileController < ApplicationController
     # the model in the generated CSV file.
     csv_data = CSV.generate(col_sep: delimiter) do |csv|
       if allowed_models.include? params[:model]
-        csv << Object.const_get(params[:model]).export_headers(params[:id])
-        csv << Object.const_get(params[:model]).export_details_fields(params[:details])
-        Object.const_get(params[:model]).export_details(csv, params[:id], params[:details])
+        assignment = Object.const_get(params[:model]).new
+        csv << assignment.export_headers(params[:id])
+        csv << assignment.export_details_fields(params[:details])
+        assignment.export_details(csv, params[:id], params[:details])
+        # csv << Object.const_get(params[:model]).export_headers(params[:id])
+        # csv << Object.const_get(params[:model]).export_details_fields(params[:details])
+        # Object.const_get(params[:model]).export_details(csv, params[:id], params[:details])
       else
         flash[:error] = "This operation is not supported for #{params[:model]}"
         redirect_to :back

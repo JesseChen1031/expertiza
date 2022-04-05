@@ -73,9 +73,10 @@ class Assignment < ActiveRecord::Base
     is_calibrated
   end
 
-  def self.assign_courses_to_assignment(user)
-    @courses = Course.where(instructor_id: user.id).order(:name)
-  end
+  #Redundant method, should be removed
+  # def self.assign_courses_to_assignment(user)
+  #   @courses = Course.where(instructor_id: user.id).order(:name)
+  # end
 
   # removes an assignment from course
   def remove_assignment_from_course
@@ -386,7 +387,7 @@ class Assignment < ActiveRecord::Base
     nil
   end
 
-  def self.export_details(csv, parent_id, detail_options)
+  def export_details(csv, parent_id, detail_options)
     return csv unless detail_options.value?('true')
 
     @assignment = Assignment.find(parent_id)
@@ -418,7 +419,7 @@ class Assignment < ActiveRecord::Base
   # This method was refactored to reduce complexity, additional fields could now be added to the list - Rajan, Jasmine, Sreenidhi
   # Now you could add your export fields to the hashmap
   EXPORT_DETAIL_FIELDS = { team_id: 'Team ID / Author ID', team_name: 'Reviewee (Team / Student Name)', reviewer: 'Reviewer', question: 'Question / Criterion', question_id: 'Question ID', comment_id: 'Answer / Comment ID', comments: 'Answer / Comment', score: 'Score' }.freeze
-  def self.export_details_fields(detail_options)
+  def export_details_fields(detail_options)
     fields = []
     EXPORT_DETAIL_FIELDS.each do |key, value|
       fields << value if detail_options[key.to_s] == 'true'
@@ -426,14 +427,14 @@ class Assignment < ActiveRecord::Base
     fields
   end
 
-  def self.handle_nil(csv_field)
+  def handle_nil(csv_field)
     return ' ' if csv_field.nil?
 
     csv_field
   end
 
   # Generates a single row based on the detail_options selected
-  def self.csv_row(detail_options, answer)
+  def csv_row(detail_options, answer)
     teams_csv = []
     @response = Response.find(answer.response_id)
     map = ResponseMap.find(@response.map_id)
@@ -452,7 +453,7 @@ class Assignment < ActiveRecord::Base
   end
 
   # Populate answers will review information
-  def self.generate_answer(answers, assignment)
+  def generate_answer(answers, assignment)
     # get all response maps for this assignment
     @response_maps_for_assignment = ResponseMap.find_by_sql(["SELECT * FROM response_maps WHERE reviewed_object_id = #{assignment.id}"])
     # for each map, get the response & answer associated with it
@@ -470,14 +471,14 @@ class Assignment < ActiveRecord::Base
   end
 
   # Checks if there are rounds with no reviews
-  def self.check_empty_rounds(answers, round_num, res_type)
+  def check_empty_rounds(answers, round_num, res_type)
     if answers[round_num][res_type].any?
       round_num.nil? ? 'Round Nil - ' + res_type : 'Round ' + round_num.to_s + ' - ' + res_type.to_s
     end
   end
 
   # This method is used to set the headers for the csv like Assignment Name and Assignment Instructor
-  def self.export_headers(parent_id)
+  def export_headers(parent_id)
     @assignment = Assignment.find(parent_id)
     fields = []
     fields << 'Assignment Name: ' + @assignment.name.to_s
