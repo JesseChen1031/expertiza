@@ -6,7 +6,7 @@ class AuthController < ApplicationController
   verify method: :post, only: %i[login logout],
          redirect_to: { action: :list }
 
-  before_filter :create_session_processor
+  before_action :create_session_processor
 
 
 
